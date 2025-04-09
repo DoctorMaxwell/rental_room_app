@@ -8,7 +8,7 @@ def show():
     # Add Room Section
     st.subheader("Add New Room")
     room_name = st.text_input("Room name")
-    room_rent = st.number_input("Monthly rent", min_value=0)
+    room_rent = st.number_input("Monthly rent", min_value=0, step=50000, value=500000)
     room_status = st.selectbox("Status", ['available', 'occupied'])
 
     if st.button("Add Room"):
