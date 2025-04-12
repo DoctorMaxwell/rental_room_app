@@ -38,9 +38,6 @@ def show():
 
             st.success(f"Tenant '{tenant_name}' assigned to room '{selected_room_name}'.")
 
-            # Refresh the app to show updated room status
-            st.rerun()
-
         except Exception as e:
             st.error(f"Failed to register tenant: {e}")
 
