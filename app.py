@@ -1,5 +1,5 @@
 import streamlit as st
-from pages import rooms, tenants
+from modules import rooms, tenants
 from db.connection import init_db, conn
 import pandas as pd
 
