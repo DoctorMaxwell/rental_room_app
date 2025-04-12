@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from db.connection import conn, cursor
+from db.connection import conn
 from datetime import datetime
 
 cursor = conn.cursor()
