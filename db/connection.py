@@ -1,6 +1,5 @@
 import sqlite3
 
-# Connect to SQLite (shared connection for Streamlit)
 conn = sqlite3.connect('rental_manager.db', check_same_thread=False)
 cursor = conn.cursor()
 
