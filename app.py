@@ -1,21 +1,24 @@
 import streamlit as st
 from pages import rooms, tenants
-from db.connection import init_db
-# TEMPORARY DEBUG TOOL (you can delete later)
+from db.connection import init_db, conn
 import pandas as pd
-from db.connection import conn
-debug_df = pd.read_sql_query("SELECT room_id, name, status FROM rooms", conn)
-st.sidebar.markdown("### Debug: Room Status Table")
-st.sidebar.dataframe(debug_df)
 
-# Initialize DB
+# Always initialize DB
 init_db()
 
-# Sidebar menu
+# Sidebar navigation
 st.sidebar.title("Rental Room Manager")
 menu = st.sidebar.radio("Go to", ["Rooms", "Tenants"])
 
-# Route to pages
+# DEBUG: Show current room status
+try:
+    debug_df = pd.read_sql_query("SELECT room_id, name, status FROM rooms", conn)
+    st.sidebar.markdown("### Debug: Room Status")
+    st.sidebar.dataframe(debug_df)
+except Exception as e:
+    st.sidebar.error(f"DEBUG ERROR: {e}")
+
+# Routing
 if menu == "Rooms":
     rooms.show()
 elif menu == "Tenants":
