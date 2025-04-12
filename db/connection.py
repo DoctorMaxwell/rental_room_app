@@ -27,4 +27,18 @@ def init_db():
         )
     ''')
 
+    # Payments table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS payments (
+            payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tenant_id INTEGER,
+            amount INTEGER,
+            due_date TEXT,
+            paid_date TEXT,
+            status TEXT CHECK(status IN ('paid', 'unpaid')),
+            FOREIGN KEY (tenant_id) REFERENCES tenants (tenant_id)
+        )
+    ''')
+
+    
     conn.commit()
