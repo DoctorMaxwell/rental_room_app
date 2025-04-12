@@ -16,42 +16,39 @@ def show():
 
     if not available_rooms.empty:
         selected_room_name = st.selectbox("Assign to room", available_rooms['name'])
-        room_id = available_rooms[available_rooms['name'] == selected_room_name]['room_id'].values[0]
-    else:
-        st.warning("No available rooms.")
-        room_id = None
 
         if st.button("Register Tenant") and tenant_name:
-        try:
-            checkin_date = datetime.now().strftime("%Y-%m-%d")
+            try:
+                checkin_date = datetime.now().strftime("%Y-%m-%d")
 
-            # Look up room_id again (inside button logic!)
-            room_id_query = pd.read_sql_query(
-                "SELECT room_id FROM rooms WHERE name = ? AND status = 'available'",
-                conn, params=(selected_room_name,)
-            )
+                # Look up room_id again (inside button logic)
+                room_id_query = pd.read_sql_query(
+                    "SELECT room_id FROM rooms WHERE name = ? AND status = 'available'",
+                    conn, params=(selected_room_name,)
+                )
 
-            if room_id_query.empty:
-                st.error("Selected room not found or already occupied.")
-                return
+                if room_id_query.empty:
+                    st.error("Selected room not found or already occupied.")
+                    return
 
-            room_id = room_id_query['room_id'].values[0]
+                room_id = room_id_query['room_id'].values[0]
 
-            # Insert tenant
-            cursor.execute('''
-                INSERT INTO tenants (name, phone, room_id, checkin_date)
-                VALUES (?, ?, ?, ?)
-            ''', (tenant_name, tenant_phone, room_id, checkin_date))
+                # Insert tenant
+                cursor.execute('''
+                    INSERT INTO tenants (name, phone, room_id, checkin_date)
+                    VALUES (?, ?, ?, ?)
+                ''', (tenant_name, tenant_phone, room_id, checkin_date))
 
-            # Update room status
-            cursor.execute("UPDATE rooms SET status = 'occupied' WHERE room_id = ?", (room_id,))
-            conn.commit()
+                # Update room status
+                cursor.execute("UPDATE rooms SET status = 'occupied' WHERE room_id = ?", (room_id,))
+                conn.commit()
 
-            st.success(f"Tenant '{tenant_name}' assigned to room '{selected_room_name}'.")
+                st.success(f"Tenant '{tenant_name}' assigned to room '{selected_room_name}'.")
 
-        except Exception as e:
-            st.error(f"Failed to register tenant: {e}")
-
+            except Exception as e:
+                st.error(f"Failed to register tenant: {e}")
+    else:
+        st.warning("No available rooms.")
 
     # Tenant List
     st.subheader("Tenant List")
