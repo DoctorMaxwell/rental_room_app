@@ -59,3 +59,51 @@ def show():
         LEFT JOIN rooms ON tenants.room_id = rooms.room_id
     ''', conn)
     st.dataframe(df_tenants)
+
+
+
+    # --- Checkout Section ---
+    st.subheader("Checkout Tenant")
+
+    active_tenants = pd.read_sql_query(
+        "SELECT tenant_id, name FROM tenants WHERE checkout_date IS NULL", conn
+    )
+
+    if not active_tenants.empty:
+        selected_checkout_name = st.selectbox("Select tenant to check out", active_tenants["name"])
+        checkout_button = st.button("Check Out Tenant")
+
+        if checkout_button:
+            try:
+                # Get tenant ID
+                tenant_id = active_tenants[active_tenants["name"] == selected_checkout_name]["tenant_id"].values[0]
+
+                # Get room ID assigned to that tenant
+                room_id_result = pd.read_sql_query(
+                    "SELECT room_id FROM tenants WHERE tenant_id = ?", conn, params=(tenant_id,)
+                )
+
+                if not room_id_result.empty:
+                    room_id = room_id_result['room_id'].values[0]
+
+                    # Set checkout date
+                    cursor.execute(
+                        "UPDATE tenants SET checkout_date = ? WHERE tenant_id = ?",
+                        (datetime.now().strftime("%Y-%m-%d"), tenant_id)
+                    )
+
+                    # Make room available again
+                    cursor.execute(
+                        "UPDATE rooms SET status = 'available' WHERE room_id = ?",
+                        (room_id,)
+                    )
+
+                    conn.commit()
+                    st.success(f"Tenant '{selected_checkout_name}' checked out and room is now available.")
+                else:
+                    st.warning("No room found for selected tenant.")
+
+            except Exception as e:
+                st.error(f"Checkout failed: {e}")
+    else:
+        st.info("No active tenants to check out.")
