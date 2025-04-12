@@ -1,11 +1,12 @@
 import sqlite3
 
 conn = sqlite3.connect('rental_manager.db', check_same_thread=False)
-cursor = conn.cursor()
 
 def init_db():
-    # Create Rooms table
-    cursor.execute('''
+    local_cursor = conn.cursor()
+
+    # Rooms
+    local_cursor.execute('''
         CREATE TABLE IF NOT EXISTS rooms (
             room_id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -14,8 +15,8 @@ def init_db():
         )
     ''')
 
-    # Create Tenants table
-    cursor.execute('''
+    # Tenants
+    local_cursor.execute('''
         CREATE TABLE IF NOT EXISTS tenants (
             tenant_id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -27,8 +28,8 @@ def init_db():
         )
     ''')
 
-    # Payments table
-    cursor.execute('''
+    # Payments
+    local_cursor.execute('''
         CREATE TABLE IF NOT EXISTS payments (
             payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
             tenant_id INTEGER,
@@ -40,5 +41,4 @@ def init_db():
         )
     ''')
 
-    
     conn.commit()
