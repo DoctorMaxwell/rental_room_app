@@ -8,7 +8,7 @@ init_db()
 
 # Sidebar navigation
 st.sidebar.title("Rental Room Manager")
-menu = st.sidebar.radio("Go to", ["Rooms", "Tenants"])
+menu = st.sidebar.radio("Go to", ["Rooms", "Tenants", "Payments"])
 
 # DEBUG: Show current room status
 try:
@@ -23,3 +23,5 @@ if menu == "Rooms":
     rooms.show()
 elif menu == "Tenants":
     tenants.show()
+elif menu == "Payments":
+    payments.show()
