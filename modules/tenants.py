@@ -3,6 +3,8 @@ import pandas as pd
 from db.connection import conn, cursor
 from datetime import datetime
 
+cursor = conn.cursor()
+
 def show():
     st.title("Tenant Management")
 
