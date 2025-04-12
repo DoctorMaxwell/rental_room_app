@@ -34,6 +34,7 @@ def show():
             # Update room status
             cursor.execute("UPDATE rooms SET status = 'occupied' WHERE room_id = ?", (room_id,))
             conn.commit()
+            st.experimental_rerun()
 
             st.success(f"Tenant '{tenant_name}' assigned to room '{selected_room_name}'.")
 
