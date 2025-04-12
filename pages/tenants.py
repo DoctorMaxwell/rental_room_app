@@ -22,14 +22,26 @@ def show():
         room_id = None
 
     if st.button("Register Tenant") and tenant_name and room_id:
-        checkin_date = datetime.now().strftime("%Y-%m-%d")
-        cursor.execute('''
-            INSERT INTO tenants (name, phone, room_id, checkin_date)
-            VALUES (?, ?, ?, ?)
-        ''', (tenant_name, tenant_phone, room_id, checkin_date))
-        cursor.execute("UPDATE rooms SET status = 'occupied' WHERE room_id = ?", (room_id,))
-        conn.commit()
-        st.success(f"Tenant '{tenant_name}' assigned to room '{selected_room_name}'.")
+        try:
+            checkin_date = datetime.now().strftime("%Y-%m-%d")
+
+            # Insert tenant
+            cursor.execute('''
+                INSERT INTO tenants (name, phone, room_id, checkin_date)
+                VALUES (?, ?, ?, ?)
+            ''', (tenant_name, tenant_phone, room_id, checkin_date))
+
+            # Update room status
+            cursor.execute("UPDATE rooms SET status = 'occupied' WHERE room_id = ?", (room_id,))
+            conn.commit()
+
+            st.success(f"Tenant '{tenant_name}' assigned to room '{selected_room_name}'.")
+
+            # Refresh the app to show updated room status
+            st.experimental_rerun()
+
+        except Exception as e:
+            st.error(f"Failed to register tenant: {e}")
 
     # Tenant List
     st.subheader("Tenant List")
