@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 from db.connection import conn, cursor
 
+cursor = conn.cursor()
+
 def show():
     st.title("Room Management")
 
