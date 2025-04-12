@@ -11,27 +11,25 @@ def show():
     tenant_name = st.text_input("Tenant name")
     tenant_phone = st.text_input("Phone number")
 
+    # Load available rooms with both name and ID
     available_rooms = pd.read_sql_query(
-        "SELECT room_id, name FROM rooms WHERE status = 'available'", conn)
+        "SELECT room_id, name FROM rooms WHERE status = 'available'", conn
+    )
 
     if not available_rooms.empty:
-        selected_room_name = st.selectbox("Assign to room", available_rooms['name'])
+        # Show dropdown with room name, but keep track of room_id
+        room_option = st.selectbox(
+            "Assign to room",
+            available_rooms.apply(lambda row: f"{row['name']} (ID: {row['room_id']})", axis=1)
+        )
 
         if st.button("Register Tenant") and tenant_name:
             try:
                 checkin_date = datetime.now().strftime("%Y-%m-%d")
 
-                # Look up room_id again (inside button logic)
-                room_id_query = pd.read_sql_query(
-                    "SELECT room_id FROM rooms WHERE name = ? AND status = 'available'",
-                    conn, params=(selected_room_name,)
-                )
-
-                if room_id_query.empty:
-                    st.error("Selected room not found or already occupied.")
-                    return
-
-                room_id = room_id_query['room_id'].values[0]
+                # Parse room_id from selection
+                room_id = int(room_option.split("ID:")[1].replace(")", "").strip())
+                selected_room_name = available_rooms[available_rooms["room_id"] == room_id]["name"].values[0]
 
                 # Insert tenant
                 cursor.execute('''
