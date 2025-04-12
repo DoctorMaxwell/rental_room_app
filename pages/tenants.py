@@ -21,9 +21,21 @@ def show():
         st.warning("No available rooms.")
         room_id = None
 
-    if st.button("Register Tenant") and tenant_name and room_id:
+        if st.button("Register Tenant") and tenant_name:
         try:
             checkin_date = datetime.now().strftime("%Y-%m-%d")
+
+            # Look up room_id again (inside button logic!)
+            room_id_query = pd.read_sql_query(
+                "SELECT room_id FROM rooms WHERE name = ? AND status = 'available'",
+                conn, params=(selected_room_name,)
+            )
+
+            if room_id_query.empty:
+                st.error("Selected room not found or already occupied.")
+                return
+
+            room_id = room_id_query['room_id'].values[0]
 
             # Insert tenant
             cursor.execute('''
@@ -34,12 +46,12 @@ def show():
             # Update room status
             cursor.execute("UPDATE rooms SET status = 'occupied' WHERE room_id = ?", (room_id,))
             conn.commit()
-            #st.experimental_rerun()
 
             st.success(f"Tenant '{tenant_name}' assigned to room '{selected_room_name}'.")
 
         except Exception as e:
             st.error(f"Failed to register tenant: {e}")
+
 
     # Tenant List
     st.subheader("Tenant List")
